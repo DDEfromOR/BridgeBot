@@ -1,0 +1,7 @@
+*.dll
+*.pdb
+obj/**
+bin/**
+runtimes/**
+/.vs/BridgeBot/v15
+/.vs/BridgeBot/DesignTimeBuild
