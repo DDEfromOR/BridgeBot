@@ -44,6 +44,7 @@ namespace Microsoft.Bot.Builder.BridgeBot
             this._TargetBotPipeName = "bfv4.pipes"; // IF USING NAMED PIPES REPLACE THIS WITH THE NAMED PIPE YOUR TARGET BOT LISTENS ON
 
             // If using WebSockets replace the below with the target bot's MicrosoftAppId and MicrosoftAppPassword, which can be found in it's appsettings.json
+            // BridgeBot requires these fields not be blank, but if your target bot has authentication disabled the values will not matter.
             this._TargetBotId = "REPLACE WITH BOT ID";
             this._TargetBotPassword = "REPLACE WITH BOT PASSWORD";
 
