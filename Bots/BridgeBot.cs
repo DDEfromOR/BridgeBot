@@ -17,8 +17,12 @@ namespace Microsoft.Bot.Builder.BridgeBot
         private static NamedPipeClient _namedPipeClient;
         private static Dictionary<string, ITurnContext> _turnContexts = new Dictionary<string, ITurnContext>();
         private BridgeRequestHandler _handler;
-        private bool _useNamedPipes = false;
-        private bool _useWebSockets = true;
+        private bool _useNamedPipes;
+        private bool _useWebSockets;
+        private readonly string _TargetBotPipeName = "bfv4.pipes";
+        private readonly string _TargetBotEndPoint;
+        private readonly string _TargetBotId;
+        private readonly string _TargetBotPassword;
 
         public BridgeBot()
         {
@@ -32,8 +36,16 @@ namespace Microsoft.Bot.Builder.BridgeBot
 
             // Named Pipe bots do not require authentication, as a named pipe connection must originate from the same 
             // machine/instance as the bot itself.
+            // This version of BridgeBot can only support one bot connection at at a time, so one of these options must always be false.
             this._useNamedPipes = false; // Set to true to connect to a named pipe bot.
             this._useWebSockets = true; // Set to true to connect to WebSocket bot.
+
+            this._TargetBotEndPoint = "ws://localhost:3978/api/messages"; // IF USING WEBSOCKETS REPLACE THIS WITH YOUR TARGET BOT'S ENDPOINT
+            this._TargetBotPipeName = "bfv4.pipes"; // IF USING NAMED PIPES REPLACE THIS WITH THE NAMED PIPE YOUR TARGET BOT LISTENS ON
+
+            // If using WebSockets replace the below with the target bot's MicrosoftAppId and MicrosoftAppPassword, which can be found in it's appsettings.json
+            this._TargetBotId = "REPLACE WITH BOT ID";
+            this._TargetBotPassword = "REPLACE WITH BOT PASSWORD";
 
             if (!this._useWebSockets && !this._useNamedPipes)
             {
@@ -55,7 +67,7 @@ namespace Microsoft.Bot.Builder.BridgeBot
             }
             if (this._useWebSockets)
             {
-                SetupWebSocketConnection("REPLACE WITH BOT ID", "REPLACE WITH BOT PASSWORD");
+                SetupWebSocketConnection(this._TargetBotId, this._TargetBotPassword);
             }
         }
 
@@ -67,7 +79,11 @@ namespace Microsoft.Bot.Builder.BridgeBot
             }
             Connector.Authentication.MicrosoftAppCredentials appCredentials = new Connector.Authentication.MicrosoftAppCredentials(botId, botPassword);
             var authHeaders = new Dictionary<string, string>() { { "authorization", $"Bearer {appCredentials.GetTokenAsync().Result}" }, { "channelid", "emulator" } };
-            _webSocketClient = new WebSocketClient("ws://localhost:3978/api/messages", _handler, null);
+
+            // Bots hosted on Azure will require the authHeaders be passed in as the third argument below. For local testing they are optional and may cause undesired behavior.
+            // Setting the channelId to emulator causes the BotFrameworkAdapter in the target bot to treat activities differently. Search for the string 'emulator' in
+            // the BotBuilder repo to learn more.
+            _webSocketClient = new WebSocketClient(this._TargetBotEndPoint, _handler, null);
             _webSocketClient.ConnectAsync(authHeaders).Wait();
         }
 
@@ -77,7 +93,7 @@ namespace Microsoft.Bot.Builder.BridgeBot
             {
                 return;
             }
-            _namedPipeClient = new NamedPipeClient("bfv4.pipes", _handler);
+            _namedPipeClient = new NamedPipeClient(this._TargetBotPipeName, _handler);
             _namedPipeClient.ConnectAsync();
         }
 
@@ -89,6 +105,7 @@ namespace Microsoft.Bot.Builder.BridgeBot
                 Verb = "POST",
                 Path = "/api/messages"
             };
+            turnContext.Activity.ServiceUrl = "urn:BridgeBot:ws://localhost";
             request.SetBody(turnContext.Activity);
 
             if (_useNamedPipes)
@@ -117,6 +134,7 @@ namespace Microsoft.Bot.Builder.BridgeBot
                         Verb = "POST",
                         Path = "/api/messages"
                     };
+                    turnContext.Activity.ServiceUrl = "urn:BridgeBot:ws://localhost";
                     request.SetBody(turnContext.Activity);
 
                     if (_useNamedPipes)
