@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.Bot.Schema;
+using Microsoft.Bot.Streaming;
+using Microsoft.Bot.Streaming.Transport.NamedPipes;
+using Microsoft.Bot.Streaming.Transport.WebSockets;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Bot.Schema;
-using Microsoft.Bot.StreamingExtensions;
-using Microsoft.Bot.StreamingExtensions.Transport.NamedPipes;
-using Microsoft.Bot.StreamingExtensions.Transport.WebSockets;
 
 namespace Microsoft.Bot.Builder.BridgeBot
 {
@@ -37,16 +37,16 @@ namespace Microsoft.Bot.Builder.BridgeBot
             // Named Pipe bots do not require authentication, as a named pipe connection must originate from the same 
             // machine/instance as the bot itself.
             // This version of BridgeBot can only support one bot connection at at a time, so one of these options must always be false.
-            this._useNamedPipes = false; // Set to true to connect to a named pipe bot.
-            this._useWebSockets = true; // Set to true to connect to WebSocket bot.
+            this._useNamedPipes = true; // Set to true to connect to a named pipe bot.
+            this._useWebSockets = false; // Set to true to connect to WebSocket bot.
 
             this._TargetBotEndPoint = "ws://localhost:3978/api/messages"; // IF USING WEBSOCKETS REPLACE THIS WITH YOUR TARGET BOT'S ENDPOINT
             this._TargetBotPipeName = "bfv4.pipes"; // IF USING NAMED PIPES REPLACE THIS WITH THE NAMED PIPE YOUR TARGET BOT LISTENS ON
 
             // If using WebSockets replace the below with the target bot's MicrosoftAppId and MicrosoftAppPassword, which can be found in it's appsettings.json
             // BridgeBot requires these fields not be blank, but if your target bot has authentication disabled the values will not matter.
-            this._TargetBotId = "REPLACE WITH BOT ID";
-            this._TargetBotPassword = "REPLACE WITH BOT PASSWORD";
+            this._TargetBotId = "0c83e93e-a590-44a3-a7a2-ebe1d16cca5c";
+            this._TargetBotPassword = "7oZF65^B-:Gp/k[&E&23N%3r&";
 
             if (!this._useWebSockets && !this._useNamedPipes)
             {

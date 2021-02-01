@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Builder.BotFramework;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
-using Microsoft.Bot.Builder.StreamingExtensions;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,7 +56,7 @@ namespace Microsoft.Bot.Builder.BridgeBot
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
-            app.UseBotFrameworkNamedPipe();
+            app.UseNamedPipes();
             app.UseWebSockets();
             //app.UseHttpsRedirection();
             app.UseMvc();

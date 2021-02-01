@@ -1,6 +1,5 @@
-﻿
-using Microsoft.Bot.Schema;
-using Microsoft.Bot.StreamingExtensions;
+﻿using Microsoft.Bot.Schema;
+using Microsoft.Bot.Streaming;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
